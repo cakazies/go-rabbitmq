@@ -18,31 +18,42 @@ func main() {
 	failOnError(err, "Failed Open Channel")
 	defer ch.Close()
 
-	q, err := ch.QueueDeclare(
-		"hello cak", // name
-		false,       // durable
-		false,       // deleted when unused
-		false,       // ekslusif
-		false,       // no-wait
-		nil,         // argument
-	)
-	failOnError(err, "Failed to declare a queue")
-	for i := 0; i < 1000; i++ {
+	// q, err := ch.QueueDeclare(
+	// 	"hello cak", // name
+	// 	false,       // durable
+	// 	false,       // deleted when unused
+	// 	false,       // ekslusif
+	// 	false,       // no-wait
+	// 	nil,         // argument
+	// )
+	// failOnError(err, "Failed to declare a queue")
+
+	err = ch.ExchangeDeclare(
+		"logs",   // name
+		"fanout", // type
+		true,     //durable
+		false,    // auto-delete
+		false,    // internal
+		false,    // no-wait
+		nil)      // argument
+	failOnError(err, "Failed to declare a Exchange")
+
+	for i := 0; i < 100; i++ {
 		body := bodyFrom(os.Args, i)
 
 		err = ch.Publish(
-			"",     // exchange
-			q.Name, //routing key
-			false,  //mandatory
-			false,  // immediati
+			"",    // exchange
+			"",    //routing key
+			false, //mandatory
+			false, // immediati
 			amqp.Publishing{
 				DeliveryMode: amqp.Persistent,
 				ContentType:  "tect/plain",
 				Body:         []byte(body),
 			})
+		failOnError(err, "Failed to publish Massage")
 	}
 
-	failOnError(err, "Failed to publish Massage")
 }
 
 func failOnError(err error, msg string) {

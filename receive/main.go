@@ -1,9 +1,7 @@
 package main
 
 import (
-	"bytes"
 	"log"
-	"time"
 
 	"github.com/streadway/amqp"
 )
@@ -17,15 +15,34 @@ func main() {
 	failOnErrors(err, "Failed to open a Channel")
 	defer ch.Close()
 
+	err = ch.ExchangeDeclare(
+		"logs",   // name
+		"fanout", // type
+		true,     //durable
+		false,    // auto-delete
+		false,    // internal
+		false,    // no-wait
+		nil)      // argument
+	failOnErrors(err, "Failed to declare a Exchange")
+
 	q, err := ch.QueueDeclare(
-		"hello cak", // name
-		false,       // durable
-		false,       // delete when unused
-		false,       // exclusif
-		false,       // no-wait
-		nil,         // arguments
+		"",    // name
+		false, // durable
+		false, // delete when unused
+		true,  // exclusif
+		false, // no-wait
+		nil,   // arguments
 	)
 	failOnErrors(err, "Failed to Declare a queue")
+
+	err = ch.QueueBind(
+		q.Name, // queue name
+		"",     // routing key
+		"logs", // exchange
+		false,
+		nil,
+	)
+	failOnErrors(err, "Failed to queue Bind")
 
 	msgs, err := ch.Consume(
 		q.Name, // quee
@@ -43,11 +60,11 @@ func main() {
 	go func() {
 		for d := range msgs {
 			log.Printf("Received a massage: %s", d.Body)
-			dot_count := bytes.Count(d.Body, []byte("."))
-			t := time.Duration(dot_count)
-			time.Sleep(t * time.Second)
-			log.Println("Done")
-			d.Ack(false)
+			// dot_count := bytes.Count(d.Body, []byte("."))
+			// t := time.Duration(dot_count)
+			// time.Sleep(t * time.Second)
+			// log.Println("Done")
+			// d.Ack(false)
 		}
 	}()
 
