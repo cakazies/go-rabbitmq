@@ -18,12 +18,12 @@ func main() {
 	}
 
 	q, err := ch.QueueDeclare(
-		"COBALAH5", // name
-		true,       // durable
-		false,      // delete when unused
-		false,      // exclusif
-		false,      // no-wait
-		nil,        // arguments
+		"TRY-MESSAGING", // name
+		true,            // durable
+		false,           // delete when unused
+		false,           // exclusif
+		false,           // no-wait
+		nil,             // arguments
 	)
 	if err != nil {
 		log.Println("Declare is error : ", err)
@@ -37,7 +37,7 @@ func main() {
 		amqp.Publishing{
 			DeliveryMode: amqp.Persistent,
 			ContentType:  "text/plain",
-			Body:         []byte("sapitenglah"),
+			Body:         []byte("HELLO MESSAGING RABBITMQ"),
 		})
 	if err != nil {
 		log.Println("Publish is error : ", err)
