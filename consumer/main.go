@@ -18,12 +18,12 @@ func main() {
 	}
 
 	q, err := ch.QueueDeclare(
-		"COBALAH5", // name
-		true,       // durable
-		false,      // delete when unused
-		false,      // exclusif
-		false,      // no-wait
-		nil,        // arguments
+		"TRY-MESSAGING", // name
+		true,            // durable
+		false,           // delete when unused
+		false,           // exclusif
+		false,           // no-wait
+		nil,             // arguments
 	)
 	if err != nil {
 		log.Println("Failed to Declare a queue : ", err)
